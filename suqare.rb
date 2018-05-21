@@ -11,8 +11,9 @@ coef_c = gets.chomp.to_f
 disc = coef_b**2 - (4 * coef_a * coef_c)
 
 if disc >= 0
-  x1 = (-coef_b + Math.sqrt(disc)) / (2 * coef_a)  
-  x2 = (-coef_b - Math.sqrt(disc)) / (2 * coef_a)
+  sqrt = Math.sqrt(disc)
+  x1 = (-coef_b + sqrt) / (2 * coef_a)  
+  x2 = (-coef_b - sqrt) / (2 * coef_a)
 
 end
 
