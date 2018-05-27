@@ -1,6 +1,6 @@
 class Station
 
-attr_reader :name, :trains
+  attr_reader :name, :trains
   
   def initialize(name)
     @name = name
@@ -24,7 +24,7 @@ end
 
 class Route
 
-attr_accessor :stations, :from, :to
+  attr_accessor :stations, :from, :to
 
   def initialize(from, to)
   @stations = [from, to]
@@ -47,15 +47,17 @@ attr_accessor :stations, :from, :to
   end
 
   def show_route
-    print "В маршрут #{stations.first.name} - #{stations.last.name} входят: "
-    stations.each {|station| print "#{station.name}, "}
+    puts "В маршрут #{stations.first.name} - #{stations.last.name} входят: "
+    stations.each.with_index(1) do |st, index|
+      puts "#{index}: #{st.name}"
+    end
   end
 end
 
 class Train
 
-attr_accessor :number, :cargo_count, :speed, :route, :cur_st, :curr_index
-attr_reader :type
+  attr_accessor :number, :cargo_count, :speed, :route, :cur_st, :curr_index
+  attr_reader :type
 
   def initialize(number, type, cargo_count)
     @number = number
@@ -87,13 +89,15 @@ attr_reader :type
     self.route = route
     puts "Поезду #{number} задан маршрут #{route.stations.first.name} - #{route.stations.last.name}."
     @cur_st = route.stations.first
+    @cur_st.get_train(self)
   end
 
   def next_st
     @curr_index = route.stations.index(@cur_st)
     if curr_index != route.stations.size - 1
-      @cur_st = route.stations[@curr_index + 1] 
-      puts "Поезд № #{number} прибыл на станцию #{@cur_st.name}"
+      @cur_st.send_train(self)
+      @cur_st = route.stations[@curr_index + 1]
+      @cur_st.get_train(self)
     else
       puts "Поезд № #{number} уже прибыл на конечную станцию маршрута #{@cur_st.name}"
     end
@@ -102,10 +106,11 @@ attr_reader :type
   def previous_st
     @curr_index = route.stations.index(@cur_st)
     if curr_index != 0
+      @cur_st.send_train(self)
       @cur_st = route.stations[@curr_index - 1]
-      puts "Поезд № #{number} прибыл на станцию #{@cur_st.name}"
+      @cur_st.get_train(self)
     else
-      puts "Поезд № #{number} уже прибыл на конечную станцию маршрута #{@cur_st.name}"
+      puts "Поезд № #{number} уже прибыл на начальную станцию маршрута #{@cur_st.name}"
     end
   end
 
