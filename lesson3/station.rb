@@ -39,7 +39,6 @@ class Route
   def remove(station)
     if self.stations.first == station || self.stations.last == station
       puts "Вы не можете удалить начальную или конечную станцию маршрута!"
-
     else
       self.stations.delete(station)
       puts "Из текущего маршрута убрана станция #{station.name}"
@@ -56,7 +55,7 @@ end
 
 class Train
 
-  attr_accessor :number, :cargo_count, :speed, :route, :cur_st, :curr_index
+  attr_accessor :number, :cargo_count, :speed, :route, :cur_st
   attr_reader :type
 
   def initialize(number, type, cargo_count)
@@ -88,36 +87,51 @@ class Train
   def set_route(route)
     self.route = route
     puts "Поезду #{number} задан маршрут #{route.stations.first.name} - #{route.stations.last.name}."
-    @cur_st = route.stations.first
-    @cur_st.get_train(self)
+    route.stations.first.get_train(self)
   end
 
-  def next_st
-    @curr_index = route.stations.index(@cur_st)
+  def current_station
+    @cur_st = route.stations.detect { |t| t.trains.include?(self) }
+    if @cur_st.nil?
+      puts "Поезду № #{number} все еще не назначен маршрут!"
+    else
+      @cur_st
+    end
+  end
+
+  def next_station
+    curr_index = route.stations.index(@cur_st)
     if curr_index != route.stations.size - 1
-      @cur_st.send_train(self)
-      @cur_st = route.stations[@curr_index + 1]
-      @cur_st.get_train(self)
+      route.stations[curr_index + 1]
     else
-      puts "Поезд № #{number} уже прибыл на конечную станцию маршрута #{@cur_st.name}"
+      puts "Поезд № #{number} уже прибыл на конечную станцию маршрута #{current_station.name}"
     end
   end
 
-  def previous_st
-    @curr_index = route.stations.index(@cur_st)
+  def previous_station
+    curr_index = route.stations.index(@cur_st)
     if curr_index != 0
-      @cur_st.send_train(self)
-      @cur_st = route.stations[@curr_index - 1]
-      @cur_st.get_train(self)
+      route.stations[curr_index - 1]
     else
-      puts "Поезд № #{number} уже прибыл на начальную станцию маршрута #{@cur_st.name}"
+      puts "Поезд № #{number} уже прибыл на начальную станцию маршрута #{current_station.name}"
     end
   end
 
-  def st_around
-    @curr_index = route.stations.index(@cur_st)
-    puts "Cейчас поезд № #{number} на станции #{@cur_st.name}"
-    puts "Предыдущая станция #{route.stations[@curr_index - 1].name}" if curr_index != 0
-    puts "Следующая станция #{route.stations[@curr_index + 1].name}" if curr_index != route.stations.size - 1
+  def move_next_station
+    if current_station == route.stations.last
+      puts "Поезд № #{number} уже прибыл на конечную станцию маршрута #{current_station.name}"
+    else
+      current_station.send_train(self)
+      next_station.get_train(self)
+    end
+  end
+
+  def move_previous_station
+    if current_station == route.stations.first
+      puts "Поезд № #{number} уже прибыл на начальную станцию маршрута #{current_station.name}"
+    else
+      current_station.send_train(self)
+      previous_station.get_train(self)
+    end
   end
 end
