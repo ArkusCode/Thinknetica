@@ -1,7 +1,8 @@
 class CargoTrain < Train
 
-  def initialize(number, type = "Cargo")
+  def initialize(number)
     super
+    @type = "Cargo"
   end
 
   def add_car(car)

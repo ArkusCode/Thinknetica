@@ -3,16 +3,14 @@ class Train
   attr_accessor :number, :cars, :speed, :route, :cur_st
   attr_reader :type
 
-  def initialize(number, type)
+  def initialize(number)
     @number = number
-    @type = type
     @cars = []
     @speed = 0
   end
 
   def train_stop
     self.speed = 0
-    puts "Поезд № #{number} cтоит!"
   end
 
   def add_car(car)
@@ -33,7 +31,6 @@ class Train
 
   def set_route(route)
     self.route = route
-    puts "Поезду № #{number} задан маршрут #{route.stations.first.name} - #{route.stations.last.name}."
     route.stations.first.get_train(self)
   end
 

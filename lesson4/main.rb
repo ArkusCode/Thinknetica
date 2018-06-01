@@ -8,4 +8,4 @@ require_relative 'station.rb'
 require_relative 'route.rb'
 require_relative 'railroad.rb'
 
-a = RailRoad.new
+

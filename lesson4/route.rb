@@ -9,7 +9,6 @@ class Route
 
   def add(station)
     self.stations.insert(-2, station)
-    puts "Добавленна промежуточная остановка на станции #{station.name}"
   end
 
   def remove(station)
@@ -24,7 +23,6 @@ class Route
   end
 
   def show_route
-    puts "В маршрут #{stations.first.name} - #{stations.last.name} входят: "
     stations.each.with_index(1) do |st, index|
       puts "#{index}: #{st.name}"
     end

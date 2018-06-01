@@ -1,17 +1,15 @@
 class RailRoad
 
   def initialize
+    @stations = []
+    @trains = []
+    @routs = []
+  end
+
+  def run
     puts "Вас приветствует RailRoad Manager v0.1a!"
     main_menu
   end
-
-private #Не должно быть доступно извне класса
-
-@@stations = []
-@@trains = []
-@@routs = []
-CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
-
 
   def main_menu
     puts %Q(
@@ -49,6 +47,10 @@ CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
     end  
   end
 
+private #Не должно быть доступно извне класса
+
+CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
+  
   def create_menu
     puts %Q(
     0 : Вернуться в главное меню
@@ -65,8 +67,8 @@ CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
     when 1
       puts "Введите название новой станции"
       station_name = gets.chomp
-      if !@@stations.any? { |s| s.name == station_name } && station_name != ''
-        @@stations << Station.new(station_name)
+      unless @stations.any? { |s| s.name == station_name } || station_name.empty?
+        @stations << Station.new(station_name)
       else
         puts "Станция не создана: название не может быть пустым, либо такая станция уже создана."
       end
@@ -74,14 +76,14 @@ CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
     when 2
       puts "Введите номер поезда"
       number = gets.chomp
-      if !@@trains.any? { |t| t.number == number } && number != '' 
+      unless @trains.any? { |t| t.number == number } || number.empty?
         puts "Для создания пассажирского поезда введите '1', для грузового '2'."
         type_choice = gets.chomp.to_i
         case type_choice
         when 1
-          @@trains << PassengerTrain.new(number)
+          @trains << PassengerTrain.new(number)
         when 2
-          @@trains << CargoTrain.new(number)
+          @trains << CargoTrain.new(number)
         else
           puts "Поезд не создан: неверная комманда."
         end
@@ -110,29 +112,33 @@ CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
       main_menu
 
     when 1
-      if @@stations.size < 2 
+      if @stations.size < 2 
         puts "Сначала создайте хотя бы пару станций"
       else
         stations_list
         puts "Введите номер начальной станции маршрута: "
-        first_station = @@stations[id_user_prompt(@@stations.size)]
+        first_station = @stations[id_user_prompt(@stations.size)]
         puts "Введите номер конечной станции маршрута: "
-        end_station = @@stations[id_user_prompt(@@stations.size)]
-        @@routs << Route.new(first_station, end_station)
+        end_station = @stations[id_user_prompt(@stations.size)]
+        @routs << Route.new(first_station, end_station)
       end
 
     when 2
       route = route_choice
-      route.add(station_choice)
+      station = station_choice
+      route.add(station)
+      puts "Добавленна промежуточная остановка на станции #{station.name}"
       
     when 3
       route = route_choice
+      puts "В маршрут #{route.stations.first.name} - #{route.stations.last.name} входят: "
       route.show_route
       station = route.stations[id_user_prompt(route.stations.size)]
       route.remove(station)
 
     when 4
-      @@routs.each do |route|
+      @routs.each do |route|
+        puts "В маршрут #{route.stations.first.name} - #{route.stations.last.name} входят: "
         puts route.show_route
       end
 
@@ -158,7 +164,10 @@ CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
       main_menu
 
     when 1
-      train_choice.set_route(route_choice)
+      train = train_choice
+      route = route_choice
+      train.set_route(route)
+      puts "Поезду № #{train.number} задан маршрут #{route.stations.first.name} - #{route.stations.last.name}."
 
     when 2
       train = train_choice
@@ -205,33 +214,33 @@ CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
   end
 
   def stations_list
-    if @@stations.empty?
+    if @stations.empty?
       puts "Еще не создано ни одной станции, пора создать!"
       create_menu
     else
-      @@stations.each.with_index(1) do |st, index|
+      @stations.each.with_index(1) do |st, index|
         puts "#{index}: #{st.name}"
       end
     end
   end
 
   def trains_list
-    if @@trains.empty?
+    if @trains.empty?
       puts "Еще не создано ни одного поезда, пора создать"
       create_menu
     else
-      @@trains.each.with_index(1) do |train, index|
+      @trains.each.with_index(1) do |train, index|
         puts "#{index}: #{train.number} - #{train.type}"
       end
     end
   end
 
   def routs_list
-    if @@routs.empty?
+    if @routs.empty?
       puts "Еще не создано ни одного маршрута, пора создать!"
       route_menu
     else
-      @@routs.each.with_index(1) do |route, index|
+      @routs.each.with_index(1) do |route, index|
         puts "#{index}: #{route.stations.first.name} - #{route.stations.last.name}"
       end
     end
@@ -251,21 +260,21 @@ CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
   def train_choice
     trains_list
     puts "Для выбора необходимого поезда"
-    @train_choice = @@trains[id_user_prompt(@@trains.size)]
+    @train_choice = @trains[id_user_prompt(@trains.size)]
     @train_choice
   end
 
   def route_choice
     routs_list
     puts "Для выбора необходимого маршрута"
-    @route_choice = @@routs[id_user_prompt(@@routs.size)]
+    @route_choice = @routs[id_user_prompt(@routs.size)]
     @route_choice
   end
 
   def station_choice
     stations_list
     puts "Для выбора необходимой станции"
-    @station_choice = @@stations[id_user_prompt(@@stations.size)]
+    @station_choice = @stations[id_user_prompt(@stations.size)]
     @station_choice
   end
 
