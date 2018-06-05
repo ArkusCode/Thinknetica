@@ -18,16 +18,14 @@ class Station
 
   def get_train(train)
     @trains << train
-    puts "На станцию #{@name} прибыл поезд № #{train.number}."
   end
 
   def list
-    @trains.each {|train| puts "Поезд № #{train.number}, тип: #{train.type}."}
+    @trains
   end
 
   def send_train(train)
     @trains.delete(train)
-    puts "Со станции #{@name} отправился поезд № #{train.number}."
   end
      
 end

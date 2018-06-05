@@ -43,8 +43,8 @@ class RailRoad
 
     else
       error_message
-      main_menu
-    end  
+    end
+    main_menu  
   end
 
 private #Не должно быть доступно извне класса
@@ -121,6 +121,7 @@ CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
         puts "Введите номер конечной станции маршрута: "
         end_station = @stations[id_user_prompt(@stations.size)]
         @routs << Route.new(first_station, end_station)
+        puts "Создан маршрут #{first_station.name} - #{end_station.name}"
       end
 
     when 2
@@ -132,14 +133,19 @@ CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
     when 3
       route = route_choice
       puts "В маршрут #{route.stations.first.name} - #{route.stations.last.name} входят: "
-      route.show_route
+      route.show_route.each.with_index(1) {|st, index| puts "#{index}: #{st.name}"}
       station = route.stations[id_user_prompt(route.stations.size)]
-      route.remove(station)
+      if route.stations.first == station || route.stations.last == station
+        puts "Вы не можете удалить начальную или конечную станцию маршрута!"
+      else
+        route.remove(station)
+        puts "Из текущего маршрута убрана станция #{station.name}"
+      end
 
     when 4
       @routs.each do |route|
         puts "В маршрут #{route.stations.first.name} - #{route.stations.last.name} входят: "
-        puts route.show_route
+        puts route.show_route.each.with_index(1) {|st, index| puts "#{index}: #{st.name}"}
       end
 
     else
@@ -172,16 +178,36 @@ CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
     when 2
       train = train_choice
       train.add_car(CAR_TYPES[train.type].new)
+      puts "Поезду № #{train.number} прицеплен вагон."
 
     when 3
       train = train_choice
-      train.remove_car(train.cars.last)
+      if train.cars.size >= 1
+        train.remove_car(train.cars.last)
+        puts "У поезда № #{train.number} отцеплен вагон." 
+      else
+        puts "В поезде не осталось вагонов!"
+      end
 
     when 4
-      train_choice.move_next_station
+      train = train_choice
+      if train.route.nil?
+        puts "Поезду № #{train.number} еще не назначен маршрут."
+      elsif train.current_station == train.route.stations.last
+        puts "Поезд № #{train.number} уже прибыл на конечную станцию маршрута #{train.current_station.name}"
+      else
+        train.move_next_station
+      end
 
     when 5
-      train_choice.move_previous_station
+      train = train_choice
+      if train.route.nil?
+        puts "Поезду № #{train.number} еще не назначен маршрут."
+      elsif train.current_station == train.route.stations.first
+        puts "Поезд № #{train.number} уже прибыл на конечную станцию маршрута #{train.current_station.name}"
+      else
+        train.move_previous_station
+      end
 
     else
       error_message
@@ -205,7 +231,7 @@ CAR_TYPES = { 'Cargo' => CargoCar, 'Passenger' => PassengerCar }
       stations_list
 
     when 2
-      station_choice.list
+      station_choice.list.each {|train| puts "Поезд № #{train.number}, тип: #{train.type}."}
        
     else
       error_message
