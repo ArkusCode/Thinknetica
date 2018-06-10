@@ -12,6 +12,8 @@ class RailRoad
     main_menu
   end
 
+  # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity
+
   def main_menu
     puts %(
     Для выполнения необходимой операции введите ее номер.
@@ -178,3 +180,5 @@ class RailRoad
     info_menu
   end
 end
+
+# rubocop:enable Metrics/MethodLength, Metrics/CyclomaticComplexity

@@ -4,6 +4,15 @@ AllCops:
 Style/Documentation:
   Enabled: false
 
+Style/ClassVars:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Max: 150
+
+Metrics/ClassLength:
+  Max: 150
+
 Metrics/LineLength:
   Max: 80
 
@@ -11,4 +20,4 @@ Metrics/MethodLength:
   Max: 15
 
 Metrics/AbcSize:
-  Max: 20
+  Max: 28
