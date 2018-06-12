@@ -22,6 +22,7 @@ module Validation
 
     def valid?
       validate!
+      true
     rescue RuntimeError
       false
     end
@@ -29,7 +30,7 @@ module Validation
     private
 
     def presence(value, _options)
-      raise 'Значение не может быть пустым' if value.empty? || value.nil?
+      raise 'Значение не может быть пустым' if value.nil?
     end
 
     def format(value, options)

@@ -2,17 +2,23 @@ class Train
   include Manufacturer
   include InstanceCounter
   include Validation
+  extend Accessors
 
-  attr_accessor :number, :cars, :speed, :route, :cur_st
+  attr_accessor :number, :cars, :route, :cur_st
   attr_reader :type
+  attr_accessor_with_history :speed
+  strong_attr_accessor :home_station, Station
   @@trains_all = {}
   NUMBER_FORMAT = /^[a-zа-я\d]{3}-*[a-zа-я\d]{2}$/i
+
+  validate :number, :presence
+  validate :number, :format, NUMBER_FORMAT
 
   def initialize(number)
     @type_class = self.class
     @number = number
     @cars = []
-    @speed = 0
+    self.speed = 0
     validate!
     @@trains_all[number] = self
     register_instance
